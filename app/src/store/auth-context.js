@@ -3,29 +3,38 @@ import React, { useState, useCallback } from "react";
 const AuthContext = React.createContext({
   token: "",
   isLoggedIn: false,
-  login: (token) => {},
+  login: (token, email, displayName, photoUrl) => {},
   logout: () => {},
+  email: "",
+  displayName: "",
+  photoUrl: "",
 });
 
-const retrieveStoredToken = () => {
-  const storedToken = localStorage.getItem("token");
-  return storedToken;
-};
-
 export const AuthContextProvider = (props) => {
-  const initialToken = retrieveStoredToken();
+  const initialToken = localStorage.getItem("token");
   const [token, setToken] = useState(initialToken);
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
 
   const userIsLoggedIn = !!token;
 
+  const loginHandler = (token, email, displayName, photoUrl) => {
+    setToken(token);
+    setEmail(email);
+    setDisplayName(displayName);
+    setPhotoUrl(photoUrl);
+    localStorage.setItem("token", token);
+    localStorage.setItem("email", email);
+  };
+
   const logoutHandler = useCallback(() => {
     setToken(null);
+    setEmail("");
+    setDisplayName("");
+    setPhotoUrl("");
     localStorage.removeItem("token");
-  }, []);
-
-  const loginHandler = useCallback((token) => {
-    setToken(token);
-    localStorage.setItem("token", token);
+    localStorage.removeItem("email");
   }, []);
 
   const contextValue = {
@@ -33,6 +42,9 @@ export const AuthContextProvider = (props) => {
     isLoggedIn: userIsLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
+    email: email,
+    displayName: displayName,
+    photoUrl: photoUrl,
   };
 
   return (

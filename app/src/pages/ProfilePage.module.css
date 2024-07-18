@@ -1,0 +1,12 @@
+.profile {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+.profileImage {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+}
