@@ -5,6 +5,7 @@ import AuthContext from "../store/auth-context";
 import axios from "axios";
 import classes from "./Home.module.css";
 import defaultProfileIcon from "../assets/profile.png";
+import ExpensesPage from "./ExpensePage";
 
 const Home = () => {
   const authCtx = useContext(AuthContext);
@@ -50,21 +51,26 @@ const Home = () => {
           <h2>Welcome to Expense Tracker</h2>
         </Col>
         <Col className="d-flex flex-column align-items-end">
-          <div className="d-flex align-items-center mb-2">
-            <Image
-              src={profileData.photoUrl}
-              roundedCircle
-              className={classes.profileImage}
-              onClick={goToProfileHandler}
-              style={{ cursor: "pointer", marginRight: "10px" }}
-            />
-            <Button
-              variant="outline-danger"
-              onClick={authCtx.logout}
-              className="me-3"
-            >
-              Logout
-            </Button>
+          <div className="d-flex align-items-center mb-2 flex-column">
+            <div>
+              {" "}
+              <Image
+                src={profileData.photoUrl}
+                roundedCircle
+                className={classes.profileImage}
+                onClick={goToProfileHandler}
+                style={{ cursor: "pointer", marginRight: "10px" }}
+              />
+            </div>
+            <div>
+              <Button
+                variant="danger"
+                onClick={authCtx.logout}
+                className={` rounded-4 mt-2 ${classes.button}`}
+              >
+                Logout
+              </Button>
+            </div>
           </div>
           {!profileData.isComplete && (
             <p className="text-danger mt-2">
@@ -78,6 +84,11 @@ const Home = () => {
               </span>
             </p>
           )}
+        </Col>
+      </Row>
+      <Row className="d-flex justify-content-center mt-5">
+        <Col lg={5}>
+          <ExpensesPage />
         </Col>
       </Row>
     </Container>

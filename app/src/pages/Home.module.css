@@ -2,4 +2,18 @@
   margin-right: 10px;
   width: 70px;
   height: 70px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+}
+.button {
+  position: absolute;
+  top: 80px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  margin-right: 8px;
 }

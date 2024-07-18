@@ -88,7 +88,13 @@ const ProfilePage = () => {
   return (
     <Container className="mt-4 d-flex justify-content-center align-content-center">
       {loading ? (
-        <Spinner animation="border" role="status"></Spinner>
+        <Spinner
+          animation="border"
+          role="status"
+          className="d-flex justify-content-center align-items-center"
+        >
+          <span className="sr-only">Loading...</span>
+        </Spinner>
       ) : (
         <>
           {!profileData.isComplete || isEditing ? (
@@ -97,7 +103,7 @@ const ProfilePage = () => {
               onProfileUpdate={profileUpdateHandler}
             />
           ) : (
-            <Row>
+            <Row className="me-0" style={{ marginRight: "0px" }}>
               <Col>
                 <h2>Profile</h2>
                 <Image
