@@ -1,5 +1,13 @@
 import React, { useContext, useState } from "react";
-import { Button, Container, Form, Row, Col, Spinner } from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Form,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
 import AuthContext from "../../store/auth-context";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
@@ -9,7 +17,9 @@ const AuthForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const authCtx = useContext(AuthContext);
   const history = useHistory();
 
@@ -17,11 +27,18 @@ const AuthForm = () => {
     setIsLogin((prevState) => !prevState);
   };
 
+  const switchToForgotPasswordHandler = () => {
+    setIsForgotPassword(true);
+    setError("");
+    setSuccessMessage("");
+  };
+
   const submitHandler = async (event) => {
     event.preventDefault();
     setError("");
+    setSuccessMessage("");
 
-    if (!email.trim() || !password.trim()) {
+    if (!email.trim() || (!isForgotPassword && !password.trim())) {
       setError("Email and password fields cannot be empty.");
       return;
     }
@@ -29,14 +46,20 @@ const AuthForm = () => {
     setIsLoading(true);
     const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc";
 
-    const url = isLogin
-      ? `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`
-      : `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`;
+    let url;
+    if (isForgotPassword) {
+      url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`;
+    } else {
+      url = isLogin
+        ? `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`
+        : `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`;
+    }
 
     try {
       const response = await axios.post(url, {
         email,
-        password,
+        password: isForgotPassword ? undefined : password,
+        requestType: isForgotPassword ? "PASSWORD_RESET" : undefined,
         returnSecureToken: true,
       });
 
@@ -45,9 +68,17 @@ const AuthForm = () => {
           response.data.error.message || "Authentication failed!"
         );
       }
-      authCtx.login(response.data.idToken, email);
-      console.log("User has successfully logged in/signed up.");
-      history.push("/home"); // Navigate to home page on successful login/signup
+
+      if (isForgotPassword) {
+        setSuccessMessage(
+          "Password reset email sent. Please check your inbox."
+        );
+        setIsForgotPassword(false);
+      } else {
+        authCtx.login(response.data.idToken, email);
+        console.log("User has successfully logged in/signed up.");
+        history.push("/home"); // Navigate to home page on successful login/signup
+      }
     } catch (err) {
       setError(err.response?.data?.error?.message || "Authentication failed!");
       console.log(err);
@@ -65,7 +96,11 @@ const AuthForm = () => {
             style={{ backgroundColor: "white" }}
           >
             <h3 className="text-center mb-4">
-              {isLogin ? "Login" : "Sign Up"}
+              {isForgotPassword
+                ? "Reset Password"
+                : isLogin
+                  ? "Login"
+                  : "Sign Up"}
             </h3>
             <Form onSubmit={submitHandler}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -79,18 +114,23 @@ const AuthForm = () => {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                />
-              </Form.Group>
+              {!isForgotPassword && (
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Control
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                  />
+                </Form.Group>
+              )}
 
-              {error && <p className="text-danger">{error}</p>}
+              {error && <Alert variant="danger">{error}</Alert>}
+              {successMessage && (
+                <Alert variant="success">{successMessage}</Alert>
+              )}
 
               <div className="d-grid gap-2">
                 <Button
@@ -107,6 +147,8 @@ const AuthForm = () => {
                       role="status"
                       aria-hidden="true"
                     />
+                  ) : isForgotPassword ? (
+                    "Reset Password"
                   ) : isLogin ? (
                     "Login"
                   ) : (
@@ -117,13 +159,35 @@ const AuthForm = () => {
             </Form>
 
             <div className="text-center mt-3">
-              <Button
-                variant="outline-secondary"
-                onClick={switchAuthModeHandler}
-                style={{ width: "100%" }}
-              >
-                {isLogin ? "Create new account" : "Login with existing account"}
-              </Button>
+              {!isForgotPassword && (
+                <>
+                  <Button
+                    variant="link"
+                    onClick={switchToForgotPasswordHandler}
+                    style={{ width: "100%" }}
+                  >
+                    Forgot Password?
+                  </Button>
+                  <Button
+                    variant="outline-secondary"
+                    onClick={switchAuthModeHandler}
+                    style={{ width: "100%" }}
+                  >
+                    {isLogin
+                      ? "Create new account"
+                      : "Login with existing account"}
+                  </Button>
+                </>
+              )}
+              {isForgotPassword && (
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => setIsForgotPassword(false)}
+                  style={{ width: "100%" }}
+                >
+                  Back to Login
+                </Button>
+              )}
             </div>
           </div>
         </Col>

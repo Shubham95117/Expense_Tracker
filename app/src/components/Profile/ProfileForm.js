@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Form, Button, Spinner, Container } from "react-bootstrap";
+import { Form, Button, Spinner, Container, Alert } from "react-bootstrap";
 import AuthContext from "../../store/auth-context";
 import axios from "axios";
 
@@ -9,12 +9,14 @@ const ProfileForm = ({ profileData, onProfileUpdate }) => {
     profileData.photoUrl || ""
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const authCtx = useContext(AuthContext);
   const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc";
 
   const submitHandler = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+    setErrorMessage("");
 
     try {
       await axios.post(
@@ -26,10 +28,10 @@ const ProfileForm = ({ profileData, onProfileUpdate }) => {
           returnSecureToken: false,
         }
       );
-      console.log("updated successfully");
       onProfileUpdate({ name: enteredName, photoUrl: enteredImageUrl });
     } catch (error) {
       console.error("Failed to update profile:", error);
+      setErrorMessage("Failed to update profile. Please try again later.");
     }
 
     setIsLoading(false);
@@ -70,6 +72,12 @@ const ProfileForm = ({ profileData, onProfileUpdate }) => {
           <Button variant="primary" type="submit">
             Update Profile
           </Button>
+        )}
+
+        {errorMessage && (
+          <Alert variant="danger" className="mt-3">
+            {errorMessage}
+          </Alert>
         )}
       </Form>
     </Container>
