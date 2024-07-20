@@ -45,7 +45,7 @@ const Home = () => {
   };
 
   return (
-    <Container className="mt-4">
+    <Container className={`mt-4 ${classes.expensesPage}`}>
       <Row>
         <Col>
           <h2>Welcome to Expense Tracker</h2>
@@ -86,7 +86,7 @@ const Home = () => {
           )}
         </Col>
       </Row>
-      <Row className="d-flex justify-content-center mt-5">
+      <Row className={`d-flex justify-content-center mt-5 ${classes.content}`}>
         <Col lg={5}>
           <ExpensesPage />
         </Col>

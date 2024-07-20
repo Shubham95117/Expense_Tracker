@@ -1,35 +1,59 @@
-// src/components/Expenses/ExpenseForm.js
-import React, { useState, useContext } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import AuthContext from "../../store/auth-context";
+import React, { useState, useEffect } from "react";
+import { Form, Button, Container } from "react-bootstrap";
 import axios from "axios";
 
-const ExpenseForm = ({ onAddExpense }) => {
+const ExpenseForm = ({ onAddExpense, currentExpense, onUpdateExpense }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
-  const authCtx = useContext(AuthContext);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (currentExpense) {
+      setAmount(currentExpense.amount);
+      setDescription(currentExpense.description);
+      setCategory(currentExpense.category);
+      setIsEditing(true);
+    } else {
+      setAmount("");
+      setDescription("");
+      setCategory("Food");
+      setIsEditing(false);
+    }
+  }, [currentExpense]);
 
   const submitHandler = async (event) => {
     event.preventDefault();
 
     const expenseData = { amount, description, category };
 
-    // try {
-    //   await axios.post("/api/expenses", expenseData, {
-    //     headers: { Authorization: `Bearer ${authCtx.token}` },
-    //   });
-    //   onAddExpense(expenseData);
-    //   setAmount("");
-    //   setDescription("");
-    //   setCategory("Food");
-    // } catch (error) {
-    //   console.error("Failed to add expense:", error);
-    // }
-    onAddExpense(expenseData);
+    if (isEditing) {
+      try {
+        await axios.patch(
+          `https://expense-tracker-5058d-default-rtdb.firebaseio.com/expenses/${currentExpense.id}.json`,
+          expenseData
+        );
+        onUpdateExpense(currentExpense.id, expenseData);
+      } catch (error) {
+        console.error("Failed to update expense:", error);
+      }
+    } else {
+      try {
+        const response = await axios.post(
+          "https://expense-tracker-5058d-default-rtdb.firebaseio.com/expenses.json",
+          expenseData
+        );
+        const newExpense = { id: response.data.name, ...expenseData };
+        onAddExpense(newExpense);
+      } catch (error) {
+        console.error("Failed to add expense:", error);
+      }
+    }
+
     setAmount("");
     setDescription("");
     setCategory("Food");
+    setIsEditing(false);
   };
 
   return (
@@ -41,6 +65,7 @@ const ExpenseForm = ({ onAddExpense }) => {
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            min={0}
             required
           />
         </Form.Group>
@@ -66,7 +91,9 @@ const ExpenseForm = ({ onAddExpense }) => {
             <option value="Salary">Salary</option>
           </Form.Control>
         </Form.Group>
-        <Button type="submit">Add Expense</Button>
+        <Button type="submit">
+          {isEditing ? "Update Expense" : "Add Expense"}
+        </Button>
       </Form>
     </Container>
   );
