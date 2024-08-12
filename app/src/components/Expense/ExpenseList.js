@@ -1,68 +1,44 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import ExpenseForm from "../Expense/ExpenseForm";
-import ExpenseList from "../Expense/ExpenseList";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteExpense } from "../../store/ExpenseRedux/expense-slice";
+import { ListGroup, Button } from "react-bootstrap";
 
-const ExpensesPage = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [currentExpense, setCurrentExpense] = useState(null);
+const ExpenseList = ({ onEdit }) => {
+  const expenses = useSelector((state) => state.expenses.expenses);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await axios.get(
-          "https://expense-tracker-5058d-default-rtdb.firebaseio.com/expenses.json"
-        );
-        const expensesData = Object.keys(response.data).map((key) => ({
-          id: key,
-          ...response.data[key],
-        }));
-        setExpenses(expensesData);
-      } catch (error) {
-        console.error("Failed to fetch expenses:", error);
-      }
-    };
-
-    fetchExpenses();
-  }, []);
-
-  const addExpenseHandler = (expense) => {
-    setExpenses((prevExpenses) => [...prevExpenses, expense]);
-  };
-
-  const editExpenseHandler = (expense) => {
-    setCurrentExpense(expense);
-  };
-
-  const updateExpenseHandler = (id, updatedData) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((expense) =>
-        expense.id === id ? { ...expense, ...updatedData } : expense
-      )
-    );
-    setCurrentExpense(null);
-  };
-
-  const deleteExpenseHandler = (id) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.filter((expense) => expense.id !== id)
-    );
+  const handleDelete = (id) => {
+    dispatch(deleteExpense(id));
   };
 
   return (
-    <div>
-      <ExpenseForm
-        onAddExpense={addExpenseHandler}
-        currentExpense={currentExpense}
-        onUpdateExpense={updateExpenseHandler}
-      />
-      <ExpenseList
-        expenses={expenses}
-        onEditExpense={editExpenseHandler}
-        onDeleteExpense={deleteExpenseHandler}
-      />
-    </div>
+    <ListGroup>
+      {expenses.map((expense) => (
+        <ListGroup.Item
+          key={expense.id}
+          className="d-flex justify-content-between align-items-center"
+        >
+          <div>
+            <h5>{expense.title}</h5>
+            <p>Amount: {expense.amount}</p>
+            <p>Date: {expense.date}</p>
+          </div>
+          <div>
+            <Button
+              variant="info"
+              onClick={() => onEdit(expense)}
+              className="me-2"
+            >
+              Edit
+            </Button>
+            <Button variant="danger" onClick={() => handleDelete(expense.id)}>
+              Delete
+            </Button>
+          </div>
+        </ListGroup.Item>
+      ))}
+    </ListGroup>
   );
 };
 
-export default ExpensesPage;
+export default ExpenseList;

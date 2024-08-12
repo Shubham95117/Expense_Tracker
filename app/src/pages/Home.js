@@ -1,15 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Button, Container, Row, Col } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
-import AuthContext from "../store/auth-context";
+import { useSelector, useDispatch } from "react-redux";
+import { authActions } from "../store/auth-slice"; // Import authActions from your auth slice
 import axios from "axios";
 import classes from "./Home.module.css";
 import defaultProfileIcon from "../assets/profile.png";
-import ExpensesPage from "./ExpensePage";
+import ExpensePage from "./ExpensePage";
 
 const Home = () => {
-  const authCtx = useContext(AuthContext);
-  const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc";
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token); // Get token from Redux store
+  const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc"; // Replace with your actual Firebase API key
   const [profileData, setProfileData] = useState({
     name: "",
     photoUrl: "",
@@ -23,7 +25,7 @@ const Home = () => {
         const response = await axios.post(
           `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
           {
-            idToken: authCtx.token,
+            idToken: token,
           }
         );
         const userData = response.data.users[0];
@@ -38,10 +40,15 @@ const Home = () => {
     };
 
     fetchProfileData();
-  }, [authCtx.token]);
+  }, [token]);
 
   const goToProfileHandler = () => {
     history.push("/profile");
+  };
+
+  const logoutHandler = () => {
+    dispatch(authActions.logout()); // Dispatch the logout action
+    history.push("/auth"); // Redirect to the auth page
   };
 
   return (
@@ -53,7 +60,6 @@ const Home = () => {
         <Col className="d-flex flex-column align-items-end">
           <div className="d-flex align-items-center mb-2 flex-column">
             <div>
-              {" "}
               <Image
                 src={profileData.photoUrl}
                 roundedCircle
@@ -65,8 +71,8 @@ const Home = () => {
             <div>
               <Button
                 variant="danger"
-                onClick={authCtx.logout}
-                className={` rounded-4 mt-2 ${classes.button}`}
+                onClick={logoutHandler} // Use logoutHandler function
+                className={`rounded-4 mt-2 ${classes.button}`}
               >
                 Logout
               </Button>
@@ -86,11 +92,7 @@ const Home = () => {
           )}
         </Col>
       </Row>
-      <Row className={`d-flex justify-content-center mt-5 ${classes.content}`}>
-        <Col lg={5}>
-          <ExpensesPage />
-        </Col>
-      </Row>
+      <ExpensePage />
     </Container>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -8,15 +8,19 @@ import {
   Alert,
   Spinner,
 } from "react-bootstrap";
-import AuthContext from "../store/auth-context";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
+import { authActions } from "../store/auth-slice";
 import classes from "./ProfilePage.module.css";
 import defaultProfileIcon from "../assets/profile.png";
 import ProfileForm from "../components/Profile/ProfileForm";
 
 const ProfilePage = () => {
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const email = useSelector((state) => state.auth.email);
   const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc";
+
   const [profileData, setProfileData] = useState({
     name: "",
     photoUrl: "",
@@ -33,7 +37,7 @@ const ProfilePage = () => {
         const response = await axios.post(
           `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
           {
-            idToken: authCtx.token,
+            idToken: token,
           }
         );
         const userData = response.data.users[0];
@@ -50,7 +54,7 @@ const ProfilePage = () => {
     };
 
     fetchProfileData();
-  }, [authCtx.token]);
+  }, [token]);
 
   const profileUpdateHandler = (updatedProfile) => {
     setProfileData({
@@ -63,11 +67,11 @@ const ProfilePage = () => {
 
   const sendEmailVerificationHandler = async () => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
         {
           requestType: "VERIFY_EMAIL",
-          idToken: authCtx.token,
+          idToken: token,
         }
       );
       setVerificationMessage(
@@ -112,7 +116,7 @@ const ProfilePage = () => {
                   className={classes.profileImage}
                 />
                 <p>Name: {profileData.name}</p>
-                <p>Email: {authCtx.email}</p>
+                <p>Email: {email}</p>
                 <Button onClick={() => setIsEditing(true)}>Edit Details</Button>
                 {!isEmailVerified && (
                   <Button

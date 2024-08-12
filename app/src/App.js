@@ -1,18 +1,18 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
   Switch,
   Redirect,
 } from "react-router-dom";
-import AuthContext from "./store/auth-context";
+import { useSelector } from "react-redux"; // Import useSelector
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
+import ExpensePage from "./pages/ExpensePage"; // Import ExpensePage
 
 function App() {
-  const authCtx = useContext(AuthContext);
-  const isLoggedIn = authCtx.isLoggedIn;
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated); // Get the auth state
 
   return (
     <Router>
@@ -31,6 +31,10 @@ function App() {
         </Route>
         <Route path="/profile">
           {isLoggedIn && <ProfilePage />}
+          {!isLoggedIn && <Redirect to="/auth" />}
+        </Route>
+        <Route path="/expenses">
+          {isLoggedIn && <ExpensePage />}
           {!isLoggedIn && <Redirect to="/auth" />}
         </Route>
         <Route path="*">

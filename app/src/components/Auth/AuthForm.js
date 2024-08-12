@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Container,
@@ -8,9 +8,10 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
-import AuthContext from "../../store/auth-context";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { authActions } from "../../store/auth-slice"; // Import the actions
 
 const AuthForm = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const AuthForm = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
   const history = useHistory();
 
   const switchAuthModeHandler = () => {
@@ -75,8 +76,15 @@ const AuthForm = () => {
         );
         setIsForgotPassword(false);
       } else {
-        authCtx.login(response.data.idToken, email);
-        console.log("User has successfully logged in/signed up.");
+        // Dispatch login action with the required payload
+        dispatch(
+          authActions.login({
+            token: response.data.idToken,
+            email: response.data.email,
+            userId: response.data.localId,
+          })
+        );
+
         history.push("/home"); // Navigate to home page on successful login/signup
       }
     } catch (err) {

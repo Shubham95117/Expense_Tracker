@@ -3,13 +3,16 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
-import { AuthContextProvider } from "./store/auth-context";
 
+import { Provider } from "react-redux";
+// import ExpenseProvider from "./store/Expense/ExpenseProvider";
+import store from "./store/ExpenseRedux/index";
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
-  <AuthContextProvider>
+  <Provider store={store}>
     <App />
-  </AuthContextProvider>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

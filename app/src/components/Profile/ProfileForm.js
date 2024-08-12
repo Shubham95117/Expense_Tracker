@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Spinner, Container, Alert } from "react-bootstrap";
-import AuthContext from "../../store/auth-context";
+import { useSelector } from "react-redux";
 import axios from "axios";
+import classes from "./ProfileForm.module.css";
 
 const ProfileForm = ({ profileData, onProfileUpdate }) => {
   const [enteredName, setEnteredName] = useState(profileData.name || "");
@@ -10,7 +11,7 @@ const ProfileForm = ({ profileData, onProfileUpdate }) => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const authCtx = useContext(AuthContext);
+  const token = useSelector((state) => state.auth.token);
   const apiKey = "AIzaSyB0ja9xoCcklY3x2gZwpnC_VL_0doFOzmc";
 
   const submitHandler = async (event) => {
@@ -22,7 +23,7 @@ const ProfileForm = ({ profileData, onProfileUpdate }) => {
       await axios.post(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${apiKey}`,
         {
-          idToken: authCtx.token,
+          idToken: token,
           displayName: enteredName,
           photoUrl: enteredImageUrl,
           returnSecureToken: false,

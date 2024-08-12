@@ -1,58 +1,65 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import ExpenseForm from "../components/Expense/ExpenseForm";
 import ExpenseList from "../components/Expense/ExpenseList";
+import { fetchExpenses } from "../store/ExpenseRedux/expense-slice";
+import { Container, Row, Col, Button, Card } from "react-bootstrap";
 
-const ExpensesPage = () => {
-  const [expenses, setExpenses] = useState([]);
+const ExpensePage = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+  const showActivatePremium = useSelector(
+    (state) => state.expenses.showActivatePremium
+  );
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await axios.get(
-          "https://expense-tracker-5058d-default-rtdb.firebaseio.com/expenses.json"
-        );
-        const expensesData = Object.keys(response.data).map((key) => ({
-          id: key,
-          ...response.data[key],
-        }));
-        setExpenses(expensesData);
-      } catch (error) {
-        console.error("Failed to fetch expenses:", error);
-      }
-    };
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
-    fetchExpenses();
-  }, []);
-
-  const addExpenseHandler = (expense) => {
-    setExpenses((prevExpenses) => [...prevExpenses, expense]);
+  const startEditingHandler = (expense) => {
+    setEditingExpense(expense);
+    setIsEditing(true);
   };
 
-  const editExpenseHandler = (id, updatedData) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((expense) =>
-        expense.id === id ? { ...expense, ...updatedData } : expense
-      )
-    );
-  };
-
-  const deleteExpenseHandler = (id) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.filter((expense) => expense.id !== id)
-    );
+  const stopEditingHandler = () => {
+    setEditingExpense(null);
+    setIsEditing(false);
   };
 
   return (
-    <div>
-      <ExpenseForm onAddExpense={addExpenseHandler} />
-      <ExpenseList
-        expenses={expenses}
-        onEditExpense={editExpenseHandler}
-        onDeleteExpense={deleteExpenseHandler}
-      />
-    </div>
+    <Container className="mt-4">
+      <Row className="mb-4">
+        <Col>
+          {showActivatePremium && (
+            <Button variant="danger" className="mb-3">
+              Activate Premium
+            </Button>
+          )}
+          {!isEditing && (
+            <Button variant="primary" onClick={() => setIsEditing(true)}>
+              Add Expense
+            </Button>
+          )}
+        </Col>
+      </Row>
+      <Row>
+        <Col md={8}>
+          {isEditing && (
+            <Card>
+              <Card.Body>
+                <ExpenseForm
+                  editingExpense={editingExpense}
+                  onClose={stopEditingHandler}
+                />
+              </Card.Body>
+            </Card>
+          )}
+          <ExpenseList onEdit={startEditingHandler} />
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
-export default ExpensesPage;
+export default ExpensePage;
