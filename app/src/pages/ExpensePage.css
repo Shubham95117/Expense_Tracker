@@ -1,0 +1,29 @@
+/* Add these styles to your CSS file */
+
+body.black {
+  background-color: black;
+  transition: background-color 0.3s ease;
+}
+
+body.dark {
+  background-color: #333;
+  transition: background-color 0.3s ease;
+}
+
+.expense-page-background {
+  min-height: 100vh;
+  padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.expense-page-background.black {
+  background-color: black;
+}
+
+.expense-page-background.dark {
+  background-color: #333;
+}
+
+button {
+  margin-right: 10px;
+}

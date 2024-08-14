@@ -17,3 +17,11 @@
   font-size: 13px;
   margin-right: 8px;
 }
+.expensepagebackground {
+  background-image: url("../assets/bg2.avif"); /* Replace with your image path */
+  background-size: cover; /* Cover the entire container */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Prevent repeating */
+  min-height: 100vh; /* Ensure it covers the full viewport height */
+  padding: 20px; /* Optional: Add some padding */
+}

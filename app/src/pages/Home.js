@@ -52,48 +52,50 @@ const Home = () => {
   };
 
   return (
-    <Container className={`mt-4 ${classes.expensesPage}`}>
-      <Row>
-        <Col>
-          <h2>Welcome to Expense Tracker</h2>
-        </Col>
-        <Col className="d-flex flex-column align-items-end">
-          <div className="d-flex align-items-center mb-2 flex-column">
-            <div>
-              <Image
-                src={profileData.photoUrl}
-                roundedCircle
-                className={classes.profileImage}
-                onClick={goToProfileHandler}
-                style={{ cursor: "pointer", marginRight: "10px" }}
-              />
+    <div>
+      <Container className={`mt-4 ${classes.expensesPage}`}>
+        <Row>
+          <Col>
+            <h2>Welcome to Expense Tracker</h2>
+          </Col>
+          <Col className="d-flex flex-column align-items-end">
+            <div className="d-flex align-items-center mb-2 flex-column">
+              <div>
+                <Image
+                  src={profileData.photoUrl}
+                  roundedCircle
+                  className={classes.profileImage}
+                  onClick={goToProfileHandler}
+                  style={{ cursor: "pointer", marginRight: "10px" }}
+                />
+              </div>
+              <div>
+                <Button
+                  variant="danger"
+                  onClick={logoutHandler} // Use logoutHandler function
+                  className={`rounded-4 mt-2 ${classes.button}`}
+                >
+                  Logout
+                </Button>
+              </div>
             </div>
-            <div>
-              <Button
-                variant="danger"
-                onClick={logoutHandler} // Use logoutHandler function
-                className={`rounded-4 mt-2 ${classes.button}`}
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-          {!profileData.isComplete && (
-            <p className="text-danger mt-2">
-              Your profile is incomplete.{" "}
-              <span
-                onClick={goToProfileHandler}
-                className="text-primary"
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-              >
-                Complete Now.
-              </span>
-            </p>
-          )}
-        </Col>
-      </Row>
-      <ExpensePage />
-    </Container>
+            {!profileData.isComplete && (
+              <p className="text-danger mt-2">
+                Your profile is incomplete.{" "}
+                <span
+                  onClick={goToProfileHandler}
+                  className="text-primary"
+                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                >
+                  Complete Now.
+                </span>
+              </p>
+            )}
+          </Col>
+        </Row>
+        <ExpensePage />
+      </Container>
+    </div>
   );
 };
 

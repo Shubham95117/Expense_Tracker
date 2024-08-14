@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -5,14 +6,14 @@ import {
   Switch,
   Redirect,
 } from "react-router-dom";
-import { useSelector } from "react-redux"; // Import useSelector
+import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
-import ExpensePage from "./pages/ExpensePage"; // Import ExpensePage
+import ExpensePage from "./pages/ExpensePage";
 
 function App() {
-  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated); // Get the auth state
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
 
   return (
     <Router>

@@ -7,19 +7,21 @@ import {
 } from "../../store/ExpenseRedux/expense-slice";
 
 const ExpenseForm = ({ editingExpense, onClose }) => {
-  const [title, setTitle] = useState(
-    editingExpense ? editingExpense.title : ""
+  const [description, setDescription] = useState(
+    editingExpense ? editingExpense.description : ""
   );
   const [amount, setAmount] = useState(
     editingExpense ? editingExpense.amount : ""
   );
-  const [date, setDate] = useState(editingExpense ? editingExpense.date : "");
+  const [category, setCategory] = useState(
+    editingExpense ? editingExpense.category : "Food"
+  );
 
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const expenseData = { title, amount: +amount, date };
+    const expenseData = { description, amount: +amount, category };
 
     if (editingExpense) {
       dispatch(updateExpense({ id: editingExpense.id, expenseData }));
@@ -32,12 +34,12 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="formTitle">
-        <Form.Label>Title</Form.Label>
+      <Form.Group controlId="formDescription">
+        <Form.Label>Description</Form.Label>
         <Form.Control
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           required
         />
       </Form.Group>
@@ -50,14 +52,18 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
           required
         />
       </Form.Group>
-      <Form.Group controlId="formDate" className="mt-3">
-        <Form.Label>Date</Form.Label>
+      <Form.Group controlId="formCategory" className="mt-3">
+        <Form.Label>Category</Form.Label>
         <Form.Control
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
+          as="select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option>Food</option>
+          <option>Petrol</option>
+          <option>Salary</option>
+          <option>Other</option>
+        </Form.Control>
       </Form.Group>
       <Button variant="primary" type="submit" className="mt-3">
         {editingExpense ? "Update Expense" : "Add Expense"}

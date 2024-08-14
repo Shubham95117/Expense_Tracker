@@ -17,11 +17,12 @@ const ExpenseList = ({ onEdit }) => {
         <ListGroup.Item
           key={expense.id}
           className="d-flex justify-content-between align-items-center"
+          style={{ borderRadius: "8px", marginBottom: "10px", padding: "15px" }}
         >
           <div>
-            <h5>{expense.title}</h5>
+            <h5>{expense.description}</h5>
             <p>Amount: {expense.amount}</p>
-            <p>Date: {expense.date}</p>
+            <p>Category: {expense.category}</p>
           </div>
           <div>
             <Button
