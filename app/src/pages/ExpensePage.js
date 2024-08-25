@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import ExpenseForm from "../components/Expense/ExpenseForm";
-import ExpenseList from "../components/Expense/ExpenseList";
 import { fetchExpenses } from "../store/ExpenseRedux/expense-slice";
 import { toggleTheme } from "../store/theme-slice";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
-import "./ExpensePage.css";
 import { saveAs } from "file-saver";
-
-const ExpensePage = () => {
+import ExpenseForm from "../components/Expense/ExpenseForm";
+import ExpenseList from "../components/Expense/ExpenseList";
+import "./ExpensePage.css";
+const ExpensePage = React.memo(() => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [premiumActivated, setPremiumActivated] = useState(false);
@@ -16,35 +15,39 @@ const ExpensePage = () => {
   const expenses = useSelector((state) => state.expenses.expenses);
   const darkMode = useSelector((state) => state.theme.darkMode);
 
-  const showActivatePremium =
-    expenses.reduce((total, expense) => total + expense.amount, 0) > 10000;
+  const showActivatePremium = useMemo(
+    () =>
+      expenses.reduce((total, expense) => total + expense.amount, 0) > 10000,
+    [expenses]
+  );
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchExpenses());
   }, [dispatch]);
 
-  const startEditingHandler = (expense) => {
+  const startEditingHandler = useCallback((expense) => {
     setEditingExpense(expense);
     setIsEditing(true);
-  };
+  }, []);
 
-  const stopEditingHandler = () => {
+  const stopEditingHandler = useCallback(() => {
     setEditingExpense(null);
     setIsEditing(false);
-  };
+  }, []);
 
-  const handleActivatePremium = () => {
+  const handleActivatePremium = useCallback(() => {
     setPremiumActivated(true);
-  };
+  }, []);
 
-  const downloadCSV = () => {
+  const downloadCSV = useCallback(() => {
     const csvContent = expenses
       .map((exp) => `${exp.amount},${exp.description},${exp.category}`)
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     saveAs(blob, "expenses.csv");
-  };
+  }, [expenses]);
 
   const themeClass = darkMode
     ? "expense-page-background dark"
@@ -119,6 +122,6 @@ const ExpensePage = () => {
       </Container>
     </div>
   );
-};
+});
 
 export default ExpensePage;

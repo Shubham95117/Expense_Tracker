@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Form, Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import {
@@ -6,7 +6,7 @@ import {
   updateExpense,
 } from "../../store/ExpenseRedux/expense-slice";
 
-const ExpenseForm = ({ editingExpense, onClose }) => {
+const ExpenseForm = React.memo(({ editingExpense, onClose }) => {
   const [description, setDescription] = useState(
     editingExpense ? editingExpense.description : ""
   );
@@ -19,18 +19,21 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
 
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const expenseData = { description, amount: +amount, category };
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const expenseData = { description, amount: +amount, category };
 
-    if (editingExpense) {
-      dispatch(updateExpense({ id: editingExpense.id, expenseData }));
-    } else {
-      dispatch(addExpense(expenseData));
-    }
+      if (editingExpense) {
+        dispatch(updateExpense({ id: editingExpense.id, expenseData }));
+      } else {
+        dispatch(addExpense(expenseData));
+      }
 
-    onClose();
-  };
+      onClose();
+    },
+    [description, amount, category, editingExpense, dispatch, onClose]
+  );
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -73,6 +76,6 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
       </Button>
     </Form>
   );
-};
+});
 
 export default ExpenseForm;

@@ -97,7 +97,7 @@ const ProfilePage = () => {
           role="status"
           className="d-flex justify-content-center align-items-center"
         >
-          <span className="sr-only">Loading...</span>
+          {/* <span className="sr-only">Loading...</span> */}
         </Spinner>
       ) : (
         <>

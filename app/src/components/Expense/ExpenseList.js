@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteExpense } from "../../store/ExpenseRedux/expense-slice";
 import { ListGroup, Button } from "react-bootstrap";
 
-const ExpenseList = ({ onEdit }) => {
+const ExpenseList = React.memo(({ onEdit }) => {
   const expenses = useSelector((state) => state.expenses.expenses);
   const dispatch = useDispatch();
 
-  const handleDelete = (id) => {
-    dispatch(deleteExpense(id));
-  };
+  const handleDelete = useCallback(
+    (id) => {
+      dispatch(deleteExpense(id));
+    },
+    [dispatch]
+  );
 
   return (
     <ListGroup>
@@ -40,6 +43,6 @@ const ExpenseList = ({ onEdit }) => {
       ))}
     </ListGroup>
   );
-};
+});
 
 export default ExpenseList;

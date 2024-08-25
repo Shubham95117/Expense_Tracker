@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Asynchronous Thunks for Fetching and Storing Expenses
 export const fetchExpenses = createAsyncThunk(
   "expenses/fetchExpenses",
   async (_, { getState }) => {
     const email = getState().auth.email;
     if (!email) throw new Error("User is not authenticated.");
 
-    // Encode email for URL
     const encodedEmail = email.replace(/[@.]/g, "");
     const response = await axios.get(
       `https://expense-tracker1-274cd-default-rtdb.firebaseio.com/${encodedEmail}/expenses.json`
@@ -31,7 +29,6 @@ export const addExpense = createAsyncThunk(
     const email = getState().auth.email;
     if (!email) throw new Error("User is not authenticated.");
 
-    // Encode email for URL
     const encodedEmail = email.replace(/[@.]/g, "");
     const response = await axios.post(
       `https://expense-tracker1-274cd-default-rtdb.firebaseio.com/${encodedEmail}/expenses.json`,
@@ -48,7 +45,6 @@ export const updateExpense = createAsyncThunk(
     const email = getState().auth.email;
     if (!email) throw new Error("User is not authenticated.");
 
-    // Encode email for URL
     const encodedEmail = email.replace(/[@.]/g, "");
     await axios.put(
       `https://expense-tracker1-274cd-default-rtdb.firebaseio.com/${encodedEmail}/expenses/${id}.json`,
@@ -65,7 +61,6 @@ export const deleteExpense = createAsyncThunk(
     const email = getState().auth.email;
     if (!email) throw new Error("User is not authenticated.");
 
-    // Encode email for URL
     const encodedEmail = email.replace(/[@.]/g, "");
     await axios.delete(
       `https://expense-tracker1-274cd-default-rtdb.firebaseio.com/${encodedEmail}/expenses/${id}.json`
@@ -75,7 +70,6 @@ export const deleteExpense = createAsyncThunk(
   }
 );
 
-// Initial State
 const initialState = {
   expenses: [],
   status: null,
@@ -84,7 +78,6 @@ const initialState = {
   showActivatePremium: false,
 };
 
-// Expense Slice
 const expenseSlice = createSlice({
   name: "expenses",
   initialState,
